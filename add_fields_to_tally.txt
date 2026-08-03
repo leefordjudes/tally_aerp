@@ -1,3 +1,4 @@
+;;=== Add ApIsImported to voucher under narration
 [#Part: VCH Narration]
 	Add:Line:ApIsImported
 
@@ -17,8 +18,8 @@
 	Invisible	: Yes
 
 	
-	
-;; Add Id, IsImported 
+
+;;=== Add ApIsImported, ApId to ledger under ledger details
 [#Part: MST LED Details]
 	Add:Line:MstLedApInfo
 
@@ -31,5 +32,3 @@
 		Storage		:	ApId
 		Info			: $ApId
 		Invisible	: If $ApId > 0 Then No Else Yes
-
-	

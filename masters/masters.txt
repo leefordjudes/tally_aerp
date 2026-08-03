@@ -7,10 +7,10 @@
 	Item: Blank
 
 	Indent	: "Reports"
-	Key Item: "Voucher Type"	: O : Display	:	APVoucherTypeMap	
-	Key Item: "Group"					: R : Display	:	APAccountGroupMap
-	Key Item: "Ledgers"				: L : Display	:	APAccountMap
-	Key Item: "Alter Ledger"	: A	: Alter Collection: Ledger
+	Key Item: "Voucher Type"				: O : Display	:	APVoucherTypeMap	
+	Key Item: "Group"								: R : Display	:	APAccountGroupMap
+	Key Item: "Ledgers(Imported)"		: L : Display	:	APAccountMap
+;	Key Item: "Alter Ledger"				: A	: Alter Collection: Ledger
 	
 	Item: Blank	
 	

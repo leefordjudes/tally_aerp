@@ -8,6 +8,7 @@
 	Height: 100% Screen
 	Part: APAccountMapTitle, APAccountMap
 	Key: Create Ledger	
+	Button : CreateLedgerBtn, DeleteLedgerBtn	
 	
 	[Part:	ApAccountMapTitle]
 		Lines  	 	: APAccountMapTitle
@@ -31,25 +32,42 @@
 		Scroll				: Vertical
 		Common Border	: Yes
 		Border				:	Column Titles
+		Object: (Company, ##SVCurrentCompany).TallyLedgers[1, $Name=$Name]
+
 		
 		[Line: APAccountMap]
 			Fields: APId Field, APAccountName Field, ApAccountType Field
 			Local: 	Field : Default : Style : Small Bold
+;			Key     : Delete Ledger Key
 				
 			[Field: APId Field]
 				Use			: NameField
 				Border  : Thin Left
-				Info		: $APId
+				Set as	: $APId
 				Width		: 20
 				
 			[Field: APAccountName Field]
 				Use			: NameField		
 				Border  : Thin Left
-				Info		: $Name			;; taken from tally ledger
+				Set As	: $Name			;; taken from tally ledger
 				Width		: 50				
 						
 			[Field: APAccountType Field]
 				Use			: NameField
 				Border  : Thin Left
-				Info		: $Parent
+				Set as	: $Parent
 				Width		: 50
+
+;[Key: Delete Ledger Key]
+;    Key     : Alt + D
+;		Action	: Delete Object
+
+[Button: CreateLedgerBtn]
+	Key: Alt + C
+	Title: "Create New Ledger"
+	Action: Delete Object
+	
+[Button: DeleteLedgerBtn]
+	Key: Alt + D
+	Title: "Delete Ledger (selected)"
+	Action: Delete Object
