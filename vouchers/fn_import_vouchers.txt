@@ -21,27 +21,27 @@
 	Local Formula: GetTallyVoucherTypeNameLcf: ##VoucherTypeMapList[$$ListIndex:VoucherTypeMapList:##SelectedVchTypeObjId]
 
 	00000: Set Object: (Company, ##SVCurrentCompany).
-	00010: Call: RefreshCallCounter
-	00100: Call: GetSelectedVoucherType
-	00200: Start Block	
-	00300:  LIST FILL : TallyLedgerMapList	: TallyLedgers 									: $name			: $parent
-	00400: 	LIST FILL : GroupMapList 	 			: APGroupsMapped								: $ApName 	: $APTallyName
-	00X00: 	LIST FILL : VoucherTypeMapList 	: ApVoucherTypesForSaveVoucher 	: $APObjId 	: $APTallyName
-	00500:	Call: APVerifyLedgerAvailabilityFn	
-	00600: End Block
-	00700: If: ##IsLedgerAvailabilityVerified = Yes
-	00800:	Walk Collection: ApVouchersDownload DataSource
-	00900: 	 START PROGRESS: ($$NumItems:data):"Import Auditplus Voucher":"Creating vouchers"
-	01000: 	 Walk Collection: data
-	01100:		SHOW PROGRESS: $$LoopIndex
-	01200: 		call : APSaveEachVoucher				
-	01300: 	 End Walk
-	01400: 	End Walk
-	01500: 	Msg Box: "Result": ($$String:##CreatedVch) +" "+@GetTallyVoucherTypeNameLcf+" Vouchers\n Successfully Created"
-	01600: 	If: ##SkippedVch > 0 
-	01700: 	 Msg Box: "Skipped Vouchers": ##SkippedVch
-	01800: 	End If		
-	01900: End If
+	00100: Call: RefreshCallCounter
+	00200: Call: GetSelectedVoucherType
+	00300: Start Block	
+	00700:	Call: APVerifyLedgerAvailabilityFn	
+	01100:  LIST FILL : TallyLedgerMapList	: TallyLedgers 									: $name			: $parent
+	01200: 	LIST FILL : GroupMapList 	 			: APGroupsMapped								: $ApName 	: $APTallyName
+	01300: 	LIST FILL : VoucherTypeMapList 	: ApVoucherTypesForSaveVoucher 	: $APObjId 	: $APTallyName
+	01400: End Block
+	01500: If: ##IsLedgerAvailabilityVerified = Yes
+	01600:	Walk Collection: ApVouchersDownload DataSource
+	01700: 	 START PROGRESS: ($$NumItems:data):"Import Auditplus Voucher":"Creating vouchers"
+	01800: 	 Walk Collection: data
+	01900:		SHOW PROGRESS: $$LoopIndex
+	02000: 		call : APSaveEachVoucher				
+	02100: 	 End Walk
+	02200: 	End Walk
+	02300: 	Msg Box: "Result": ($$String:##CreatedVch) +" "+@GetTallyVoucherTypeNameLcf+" Vouchers\n Successfully Created"
+	02400: 	If: ##SkippedVch > 0 
+	02500: 	 Msg Box: "Skipped Vouchers": ##SkippedVch
+	02600: 	End If		
+	02700: End If
 	
 	
 [Function: APSaveEachVoucher]

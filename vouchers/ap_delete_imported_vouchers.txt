@@ -58,13 +58,15 @@
 			Modifies		: ApDelImpVchTypeName : Yes
 			Set As			: If $$IsEmpty:##ApDelImpVchTypeName Then "" Else ##ApDelImpVchTypeName
 			Show Table	: Always
-			Table				: APVoucherTypeForDeleteMapped
+			Table				: APVoucherTypesMapped
 			Tooltip			: "Mapped voucher Type Names"
 		
 [Function: ApDeleteVouchersFn]
 	Parameter: ApDeleteVoucherFromDate	: Date 
 	Parameter: ApDeleteVoucherToDate		: Date 
 	Parameter: ApDeleteVoucherTypeName	: String
+	
+	Variable: DelApImpVchCount: Number: 0
 	
 	0100: If:Not $$IsEmpty:($$NumItems:ApDeleteVouchersColl)
 	0200:  Query Box: "Sure to Delete Import Vouchers" : Yes: No
@@ -76,9 +78,13 @@
 ;	00d1:  	 Msg Box: "Check Vouchers": "VoucherType: "+$VoucherTypeName+"\nVoucher Number: "+$VoucherNumber+"\nImported: "+($$String:$ApIsImported)
 	0800:  	 Set Target
 	0900:  	 Delete Target
+	0910:  	 Increment: DelApImpVchCount
 	1000:  	End Walk
 	1100:   End Batch Post
 	1200:   End Progress
 	1300:  End if
+	1310:  If: ##DelApImpVchCount > 0
+	1320:   Msg Box: "Delete Voucher Result": ($$String:##DelApImpVchCount)+" imported vouchers deleted"
+	1330:  End If
 	1400: End if
 	

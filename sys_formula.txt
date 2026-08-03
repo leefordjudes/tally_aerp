@@ -22,7 +22,7 @@
 	ApDelImpVchByDateFlt: $ApIsImported = Yes And +
 		($Date >= ##ApDelImpVchFromDate) And +
 		($Date <= ##ApDelImpVchToDate) And +
-		($VoucherTypeName = ##ApDelImpVchTypeName)
+		($ApVoucherTypeName = ##ApDelImpVchTypeName)
 
 ;;===== Used to create voucher in tally using downloaded voucher
 	GetCompanyStateName: $(Company, ##SVCurrentCompany).StateName

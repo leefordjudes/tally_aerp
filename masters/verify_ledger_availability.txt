@@ -72,8 +72,10 @@ In APlus account_id=20 having account_type_name='Profit & Loss', in that place u
 	00200:  	Msg Box: "Missing BookBegin": "BookBegin not filled in Configuration Page"
 	00300:  	Break
 	00400:  End If
-	00700:	Set: ApMastersDownloadTables: "account"
-	00800: 	Call: RefreshCallCounter
+	00500:	Set: ApMastersDownloadTables: "account"
+	00600: 	Call: RefreshCallCounter
+	00700:  LIST FILL : TallyLedgerMapList	: TallyLedgers 									: $name			: $parent
+	00800: 	LIST FILL : GroupMapList 	 			: APGroupsMapped								: $ApName 	: $APTallyName
 	00900:	Walk Collection: ApMastersDownload DataSource
 	01000: 		Start Progress: ($$NumItems:accounts):"Verifying Ledger Availability"
 	01100:    Walk Collection: accounts

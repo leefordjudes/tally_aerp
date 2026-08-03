@@ -24,11 +24,11 @@
 	Action: Call: ViewApConfiguration
 	Title: "View Configuration"		
 	
+[Include: add_fields_to_tally.txt]
 [Include: ap_configuration.txt]
 [Include: ap_login.txt]
 [Include: masters/masters.txt]
 [Include: masters/verify_ledger_availability.txt]
-[Include: vouchers/add_fields_to_vouchers.txt]
 [Include: vouchers/fn_import_vouchers.txt]
 [Include: vouchers/ap_import_vouchers.txt]
 [Include: vouchers/ap_delete_imported_vouchers.txt]

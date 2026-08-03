@@ -48,22 +48,18 @@
 	Use			  : APVoucherTypes
 	Filter		: VchTypeMappedFlt
 	Title		  : "Tally VoucherTypes"
-	Format		: $APTallyName, 20
+	Format		: $APName, 20
 	
 [Collection: ApDeleteVouchersColl]
 	Type		  : Vouchers
 	Filter		: ApDelImpVchByDateFlt
-	Format		: $VoucherTypeName, 40		
-	Format		: $VoucherNumber, 40	
-	Format		: $ApIsImported, 10
-	Format		: $Date, 10
 		
 	
 ;; Collections used from Tally Start =====================
 [Collection: TallyLedgers]
 	Type				: Ledger							;;Ledger - taken from tally internal
 	Title				: "Tally Ledgers"
-	Format			: Name, 40
+	Format			: $Name, 40
 	Format			: $Parent, 40		
 	
 [Collection: TallyVoucherTypes]

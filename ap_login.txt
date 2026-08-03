@@ -65,7 +65,8 @@
 	00900: 	End If	
 	01000: 	If: $status = "success"
 	01100:  	Set Value: ApAuthToken : $data	
-	01200: 		Msg Box: "Response": "Login Success\n\n Token Received \n\n" + $data
+	01200: 		Msg Box: "Response": "Login Success"
+;	01200: 		Msg Box: "Response": "Login Success\n\n Token Received \n\n" + $data
 	01300: 	End If
 	01400:  Alter Target
 	01500: End Walk	
