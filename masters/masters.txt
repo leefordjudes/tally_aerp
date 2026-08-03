@@ -1,0 +1,75 @@
+[Menu: APMasters]
+	Title	: "Masters (Auditplus To Tally)"
+	Key Item: "Download"			: D : Call		:	APMastersDownload
+	Button		: APDeleteALLVoucherTypes
+	Button		:	APDeleteALLAccountGroups
+	
+	Item: Blank
+
+	Indent	: "Reports"
+	Key Item: "Voucher Type"	: O : Display	:	APVoucherTypeMap	
+	Key Item: "Group"					: R : Display	:	APAccountGroupMap
+	Key Item: "Ledgers"				: L : Display	:	APAccountMap
+	Key Item: "Alter Ledger"	: A	: Alter Collection: Ledger
+	
+	Item: Blank	
+	
+	Indent	: "Mappings"
+	Key Item: "Voucher Type"	: V : Alter		:	APVoucherTypeMap
+	Key Item: "Group"					: G : Alter		:	APAccountGroupMap	
+	
+
+[Function: APDeleteALLVoucherTypes]
+	Variable: VtIdx: Number: 0
+	
+	0100: Query Box: "Are you sure to delete all voucher types" : Yes: No
+	0200: If: $$LastResult
+	0300:  Set Object: (Company, ##SVCurrentCompany).	 
+	0400:  Set Target
+	0500:  START PROGRESS	: ($$NumItems:APVoucherTypes):"Delete voucher types"
+	0600:  Walk Collection: APVoucherTypes
+	0700:   SHOW PROGRESS: $$LoopIndex
+	0800: 	Delete Collection Object : APVoucherTypes
+	0900:   Increment: VtIdx
+	1000:  End Walk	
+	1100:  End Progress
+	1200:  Alter Target
+  1300:  Msg Box: "Delete Result":($$String:##VtIdx)+" voucher types deleted" 
+  1400: End If
+	
+	
+[Button: APDeleteAllVoucherTypes]
+	Key: F4
+	Action: Call : APDeleteALLVoucherTypes
+	Title: "DeleteAll VoucherType"	
+	
+[Function: APDeleteAllAccountGroups]
+		Variable: AgIdx: Number: 0
+		
+	0100: Query Box: "Are you sure to delete all account groups" : Yes: No
+	0200: If: $$LastResult
+	0300:  Set Object: (Company, ##SVCurrentCompany).	 
+	0400:  Set Target
+	0401:  START PROGRESS	: ($$NumItems:APGroups):"Delete account groups"
+	0500:  Walk Collection: APGroups
+	0501:   SHOW PROGRESS: $$LoopIndex
+	0600: 	Delete Collection Object : APGroups
+	0700:   Increment: AgIdx
+	0800:  End Walk	
+	0801:  End Progress
+	0900:  Alter Target
+  1000:  Msg Box: "Delete Result":($$String:##AgIdx)+" account groups deleted" 
+  1100: End If
+	
+[Button: APDeleteAllAccountGroups]
+	Key: F5
+	Action: Call : APDeleteAllAccountGroups
+	Title: "DeleteAll Group"	
+
+
+[include: ap_masters_download.txt]
+[include: ap_voucher_type_map.txt]
+[include: ap_account_group_map.txt]
+[include: ap_account_map.txt]
+
+

@@ -1,0 +1,123 @@
+[Collection: ApMasters]
+	List Name: ##ApMastersDownloadTables
+;	List Name: "account_type,voucher_type,account"
+
+	
+[Function: APMastersDownload]	
+	Variable: MIdx: Number: 0
+		
+	00000: Query Box: "Do you want to download masters:\n voucher type, account group" : Yes: No
+	00100: If: $$LastResult			
+	00200: 	START BLOCK
+	00300: 	 Set Object: (Company, ##SVCurrentCompany).
+	00400: 	 LIST FILL : VoucherTypeMapList 	: APVoucherTypes	: $APObjId 		: $APTallyName
+	00500: 	 LIST FILL : GroupMapList 			  : APGroups 				: $APObjId 		: $APTallyName
+	00600: 	END BLOCK
+	00700:	 Set: ApMastersDownloadTables: "account_type,voucher_type"	
+	00800: 	 Call: RefreshCallCounter
+	00900: 	 Walk Collection: ApMastersDownload DataSource
+	01000: 	  SET TARGET	: (Company, ##SVCurrentCompany).
+	
+	01100:    If: (##ApMastersDownloadTables Contains "voucher_type")
+	01200: 	   Start Progress	: ($$NumItems:voucher_types):"Downloading Auditplus Voucher Types"
+	01300:	   Sleep: 1
+	01400: 	   Walk Collection: voucher_types
+	01500:      Show Progress:$$LoopIndex:$$Sprintf:"VoucherType Name: %s":$name
+	01600:     	If: $$ListFind:VoucherTypeMapList:$id
+;	01700:       Msg Box: "voucher type found": $id+"-"+$name
+	01800: 	  	 Modify Object : (Company, ##SVCurrentCompany).ApVoucherTypes[1, $APObjId=$id].APName : $name
+	01900: 	  	Else
+;	02000:       Msg Box: "voucher type not found": $id+"-"+$name
+	02100: 	  	 INSERT COLLECTION OBJECT   : APVoucherTypes
+	02200: 	  	 SET VALUE  : APObjId 			: $id
+	02300: 	  	 SET VALUE  : APName 				: $name
+	02400: 	  	 SET VALUE  : APVoucherType	: $base_type
+	02500: 	  	 RESET VALUE  : APTallyName ;; 	: $$SysName:NotApplicable
+	02600: 	  	 Set Target: .. 
+;	02700:       Msg Box: "voucher type inserted": $name
+  02800: 	  	 Increment: MIdx		
+	02900: 	    End If	
+	03000: 	   End Walk		
+	03100: 	   End Progress	
+	03200: 	   Alter Target
+	03300: 	   Msg Box: "Download Voucher types": ($$String:##MIdx)+" voucher types downloaded"
+	03400:    End If
+	03500:    Set: MIdx: 0
+	03600:    If: (##ApMastersDownloadTables Contains "account_type")
+	03700: 	   Start Progress	: ($$NumItems:account_types):"Downloading Auditplus Account Types"
+	03800:	   Sleep: 1
+	03900: 	   Walk Collection: account_types
+	04000:      Show Progress:$$LoopIndex:$$Sprintf:"Account Type Name: %s":$name
+	04100:     	If: $$ListFind:GroupMapList:$id
+;	04200:       Msg Box: "group found": $id+"-"+$name
+	04300: 	  	 Modify Object : (Company, ##SVCurrentCompany).ApGroups[1, $APObjId=$id].APName : $name
+	04400: 	  	Else
+;	04500:       Msg Box: "voucher type not found": $id+"-"+$name
+	04600: 	  	 INSERT COLLECTION OBJECT   : APGroups
+	04700: 	  	 SET VALUE  : APObjId 			: $id
+	04800: 	  	 SET VALUE  : APName 				: $name
+	04900: 	  	 SET VALUE  : APAccountType	: $base_types
+	05000: 	  	 RESET VALUE  : APTallyName ;; 	: $$SysName:NotApplicable
+	05100: 	  	 Set Target: .. 
+;	05200:       Msg Box: "voucher type inserted": $name
+  05300: 	  	 Increment: MIdx		
+	05400: 	    End If	
+	05500: 	   End Walk		
+	05600: 	   End Progress	
+	05700: 	   Alter Target
+	05800: 	   Msg Box: "Download Account types": ($$String:##MIdx)+" account types downloaded"
+	05900:    End If
+	
+	06000: 	 End Walk
+;	06100:	 Set: ApMastersDownloadTables: "account"
+;	06200:   Set: SVHttpCallCounter: "2"
+;	06300: 	 Walk Collection: ApMastersDownload DataSource
+;	06400: 	  SET TARGET	: (Company, ##SVCurrentCompany).
+;	06500: 	 End Walk
+	06600: End If
+	
+
+;;==== DataSource ==================================================
+
+[Collection: ApMastersDownload DataSource]
+	Data Source		: HTTP JSON: @@APExecuteUrlWithId: UTF8
+	JSON Object Path: "data:1"
+	RemoteRequest	: ApMastersDownload Request: UTF8
+	Export Header	: "auth-token:" + @@APAuthToken	
+
+[Report: ApMastersDownload Request]
+	Form: ApMastersDownload Request
+	Plain JSON: Yes
+		
+[Form: ApMastersDownload Request]
+	Delete: XMLTag
+	Full Object: Yes
+	Belongs To: Yes
+	Parts: ApMastersDownload Request Name, ApMastersDownload Request Args
+	
+	[Part: ApMastersDownload Request Name]
+		Lines: ApMastersDownload Request Name		
+		Scroll: Vertical
+		
+		[Line: ApMastersDownload Request Name]
+			Field: ApMastersDownload Request Name
+				
+				[Field: ApMastersDownload Request Name]
+					JSONTag: "name"
+					Set as: "tally_export_master"
+
+	[Part: ApMastersDownload Request Args]
+		Lines: ApMastersDownload Request Args	
+		Scroll: Vertical
+	
+		[Line: ApMastersDownload Request Args]			
+			Field: ApMastersDownload Request Args
+			Repeat: ApMastersDownload Request Args: ApMasters
+
+				[Field: ApMastersDownload Request Args]					
+					JSONTag: "args"					
+					Set as: $Name
+					
+					
+
+					

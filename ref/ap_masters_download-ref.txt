@@ -1,0 +1,71 @@
+[Collection: ApMasters]
+	List Name: ##ApMastersDownloadTables
+;	List Name: "account_type,voucher_type,account"
+
+	
+[Function: APMastersDownload]
+	Variable: ApMastersDownloadTables : String
+	Variable: SVHttpCallCounter: String	: "0"
+		
+	00000: Query Box: "Do you want to download masters:\n voucher_type, account_type" : Yes: No
+	00100: If: $$LastResult			
+	00200: 	START BLOCK
+	00300: 	 Set Object: (Company, ##SVCurrentCompany).
+	00400: 	 LIST FILL : VoucherTypeMapList 	: APVoucherTypes	: $APObjId 		: $APTallyName
+	00500: 	 LIST FILL : GroupMapList 			  : APGroups 				: $APObjId 		: $APTallyName
+	00600: 	END BLOCK
+	00700:	 Set: ApMastersDownloadTables: "account_type,voucher_type"	
+	00800:   Set: SVHttpCallCounter: "1"						;; calling http request two times using modifing call counter
+	00900: 	 Walk Collection: ApMastersDownload DataSource		 
+	01000: 	  SET TARGET	: (Company, ##SVCurrentCompany).
+	01100: 	 End Walk
+	01200:	 Set: ApMastersDownloadTables: "account"
+	01300:   Set: SVHttpCallCounter: "2"						;; calling http request two times using modifing call counter
+	01400: 	 Walk Collection: ApMastersDownload DataSource
+	01500: 	  SET TARGET	: (Company, ##SVCurrentCompany).
+	01600: 	 End Walk
+	01700: End If
+
+
+[Collection: ApMastersDownload DataSource]
+	Data Source		: HTTP JSON: @@APExecuteUrlWithId: UTF8
+	JSON Object Path: "data:1"
+	RemoteRequest	: ApMastersDownload Request: UTF8
+	Export Header	: "auth_token:" + @@APAuthToken	
+
+[Report: ApMastersDownload Request]
+	Form: ApMastersDownload Request
+	Plain JSON: Yes
+		
+[Form: ApMastersDownload Request]
+	Delete: XMLTag
+	Full Object: Yes
+	Belongs To: Yes
+	Parts: ApMastersDownload Request Name, ApMastersDownload Request Args
+	
+	[Part: ApMastersDownload Request Name]
+		Lines: ApMastersDownload Request Name		
+		Scroll: Vertical
+		
+		[Line: ApMastersDownload Request Name]
+			Field: ApMastersDownload Request Name
+				
+				[Field: ApMastersDownload Request Name]
+					JSONTag: "name"
+					Set as: "tally_export_master"
+
+	[Part: ApMastersDownload Request Args]
+		Lines: ApMastersDownload Request Args	
+		Scroll: Vertical
+	
+		[Line: ApMastersDownload Request Args]			
+			Field: ApMastersDownload Request Args
+			Repeat: ApMastersDownload Request Args: ApMasters
+
+				[Field: ApMastersDownload Request Args]					
+					JSONTag: "args"					
+					Set as: $Name
+					
+					
+
+					

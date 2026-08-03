@@ -1,0 +1,78 @@
+[Collection: ApVouchersDownload DataSource]
+	Data Source		: HTTP JSON: @@APAggregateUrlWithId: UTF8
+;	JSON Object Path: "data:1"
+	RemoteRequest	: ApVouchersDownload Request: UTF8
+	Export Header	: "auth-token:" + @@APAuthToken	
+;;----------------------------ApVouchersDownload Request Start---------------------	
+[Report: ApVouchersDownload Request]
+	Form: ApVouchersDownload Request
+	Plain JSON: Yes
+		
+[Form: ApVouchersDownload Request]
+	Delete: XMLTag
+	Full Object: Yes
+	Belongs To: Yes
+	Part: ApVouchersDownload Request Name, ApVouchersDownload Request args
+	
+[Part: ApVouchersDownload Request Name]
+	Line: ApVouchersDownload Request Name
+	Scroll: Vertical
+	
+	[Line: ApVouchersDownload Request Name]
+		Field: ApVouchersDownload Request Name
+			
+			[Field: ApVouchersDownload Request Name]
+				Use: Name Field
+				JSONTag: "name"
+				Set as: "Tally Export Voucher"
+				
+[Part: ApVouchersDownload Request Args]
+	Line: ApVouchersDownload Request Args
+	JSONTag: "args"
+	Scroll: Vertical
+
+	[Line: ApVouchersDownload Request args]		
+		Field: ApVouchersDownload Request FromDate
+		Field: ApVouchersDownload Request ToDate
+		Field: ApVouchersDownload Request BaseType		
+		Field: ApVouchersDownload Request VoucherTypeId		
+		Field: ApVouchersDownload Request B2CSaleDaywise
+		Field: ApVouchersDownload Request AccountOnly
+			
+			[Field: ApVouchersDownload Request FromDate]
+				YR: $$YearOfDate:##ApTxnFromDate
+				ZM: $$ZeroFill:($$MonthOfDate:##ApTxnFromDate):2
+				ZD: $$ZeroFill:($$DayofDate:##ApTxnFromDate):2				
+				Type		: String
+				JSONTag	: "fromDate"	
+				Set as	: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
+				
+			[Field: ApVouchersDownload Request ToDate]
+				YR: $$YearOfDate:##ApTxnToDate
+				ZM: $$ZeroFill:($$MonthOfDate:##ApTxnToDate):2
+				ZD: $$ZeroFill:($$DayofDate:##ApTxnToDate):2
+				Type		: String
+				JSONTag	: "toDate"
+				Set as	: $$String:@YR+"-"+$$String:@ZM+"-"+$$String:@ZD
+				
+			[Field: ApVouchersDownload Request BaseType]
+				Type		: String
+				JSONTag	: "baseType"
+				Set as	: ##SelectedVchTypeBaseType
+				
+			[Field: ApVouchersDownload Request VoucherTypeId]
+				Type		: String
+				JSONTag	: "voucherTypeId"
+				Set as	: ##SelectedVchTypeObjId
+			
+			[Field: ApVouchersDownload Request B2CSaleDaywise]
+				Type 		: Logical
+				JSONTag : "b2cSaleDaywise"
+				Set As	: If (Not $$IsEmpty:##ApTxnB2CSaleDaywise) And (##ApTxnB2CSaleDaywise = Yes) Then true Else false
+
+			[Field: ApVouchersDownload Request AccountOnly]
+				Type 		: Logical
+				JSONTag : "accountOnly"
+				Set As	: If (Not $$IsEmpty:##ApTxnAccountOnly) And (##ApTxnAccountOnly = Yes) Then true Else false
+				
+;;----------------------------ApVouchersDownload Request End---------------------	

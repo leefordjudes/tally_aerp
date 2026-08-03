@@ -1,0 +1,17 @@
+[Report: APAccountGroupMap]
+	Use: ApVoucherTypeMap
+	Title: "Auditplus Account Group Mapping"
+	
+	Local: Form: APVoucherTypeMap: Delete: Button
+	Local: Form: APVoucherTypeMap: Add: Button: APDeleteAllAccountGroups
+	Local: Button: APDeleteAllAccountGroups: Title: "DeleteAll"
+	
+	Local: Line: APVoucherTypeMapTitle: Local: Field: AP Name Field	: Info: "Group Name"
+	Local: Line: APVoucherTypeMapTitle: Local: Field: AP VoucherType Field : Info: "Base Account Type"
+	Local: Line: APVoucherTypeMapTitle: Local: Field: AP TallyName Field : Info: "Tally Group"
+	
+	Local: Part: APVoucherTypeMap: Repeat: APVoucherTypeMap: APGroups
+	Local: Line: APVoucherTypeMap: Local: Field: AP VoucherType Field: Info: $APAccountType
+	Local: Line: APVoucherTypeMap: Local: Field: AP TallyName Field: Delete: Table
+	Local: Line: APVoucherTypeMap: Local: Field: AP TallyName Field: Table: TallyGroups, NotApplicable
+	Local: Line: APVoucherTypeMap: Local: Field: AP TallyName Field: Add: Key: Create Group

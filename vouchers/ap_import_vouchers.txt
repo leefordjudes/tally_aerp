@@ -1,0 +1,93 @@
+[Report: APImportVouchers]
+	Title	: 	"Import Auditplus Vouchers"
+	Form	: 	ApImportVouchers
+	Object	:	Company	: ##SVCurrentCompany
+
+[Form: APImportVouchers]	
+	Parts		: Form SubTitle, APImportVouchers	
+	FullWidth   : No
+	Space Left	: 2
+	Space Right	: 2
+	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Import Auditplus Vouchers"
+	On 					: Form Accept: Yes: Call: FnImportVouchers
+	
+	[Part: APImportVouchers]
+		Line:	ApTxnB2CSaleDaywise		
+		Line:	ApTxnAccountOnly
+		Line:	APTxnFromDate
+		Line:	APTxnToDate
+		Line:	ApTxnVoucherType		
+	
+		[Line:	ApTxnAccountOnly]
+		Fields:	Medium Prompt, APTxnAccountOnly
+		Space Bottom	: 0.4				
+		Local	:	Field	:	Medium Prompt	: Info		: "Account Only"
+		
+		[Field: APTxnAccountOnly]
+			Type			: Logical
+			Use       : Logical Field
+			Info	 		: Yes 
+			Storage		: ApTxnAccountOnly
+			Modifies  : ApTxnAccountOnly : Yes			
+			Tooltip		: "Import all vouchers as account voucher"
+
+		[Line:	ApTxnB2CSaleDaywise]
+		Fields:	Medium Prompt, APTxnB2CSaleDaywise
+		Space Bottom	: 0.4				
+		Local	:	Field	:	Medium Prompt	: Info		: "B2C Sale Daywise"
+		
+		[Field: APTxnB2CSaleDaywise]
+			Type			: Logical
+			Use       : Logical Field
+			;Set as 		: Yes ;If $$IsEmpty:##ApTxnB2CSaleDaywise Then No else ##TxnB2CSaleDaywise
+			Info	 		: Yes ;If $$IsEmpty:##ApTxnB2CSaleDaywise Then No else ##TxnB2CSaleDaywise
+			Storage		: ApTxnB2CSaleDaywise
+			Modifies  : ApTxnB2CSaleDaywise : Yes			
+			Tooltip		: "Yes - Sale, CreditNote, No - Others"
+		
+	[Line: APTxnFromDate]
+		Fields: Medium Prompt, APTxnFromDate
+		Space Bottom	: 0.4				
+		Local	:	Field	:	Medium Prompt	: Info		: "From Date"
+		
+		[Field: APTxnFromDate]
+			Width		: 20
+			Max			: 250
+			Type		: Date
+			Set As		: If $$IsEmpty:##ApTxnFromDate Then $$SysInfo:SystemDate Else ##ApTxnFromDate
+			Storage		: ApTxnFromDate 
+			Modifies	: ApTxnFromDate : Yes
+			Style   	: Normal Bold
+			Tooltip		: "Date datatype, Download Transaction from 'From Date'"
+			
+
+	[Line: ApTxnToDate]
+		Fields: Medium Prompt, Ap Txn To Date
+		Space Bottom	: 0.4
+		Local	:	Field	:	Medium Prompt	: Info		: "To Date"
+		
+		[Field: APTxnToDate]	
+			Width		: 20
+			Max			: 250
+			Type		: Date
+			Set As		: If $$IsEmpty:##ApTxnToDate Then $$SysInfo:SystemDate Else ##ApTxnToDate
+			Storage		: ApTxnToDate 
+			Modifies	: ApTxnToDate : Yes
+			Style   	: Normal Bold
+			Tooltip		: "Date datatype, Download Transaction upto 'To Date'"
+			
+		
+	[Line: ApTxnVoucherType]
+		Fields: Medium Prompt, AP Txn Voucher Type
+		Space Bottom	: 1
+		Local	:	Field	:	Medium Prompt	: Info		: "Voucher Type"
+		
+		[Field: APTxnVoucherType]
+			Width		: 20
+			Max			: 250
+			Storage		: ApTxnVchTypeName
+			Modifies	: ApTxnVchTypeName : Yes
+			Style   	: Normal Bold
+			Show Table	: Always
+			Table		: APVoucherTypesMapped
+			Tooltip		: "Mapped Tally Voucher types"

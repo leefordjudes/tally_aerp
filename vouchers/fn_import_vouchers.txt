@@ -1,0 +1,136 @@
+[Include: ap_vouchers_download.txt]
+
+[Function: GetSelectedVoucherType]
+  010: Walk Collection: SelectedApVoucherTypesForImport
+	020: 	Set: SelectedVchTypeObjId: $ApObjId
+	030: 	Set: SelectedVchTypeBaseType: $ApVoucherType
+;	040:  Msg Box: "VchTypes": $ApObjId+"\n"+$ApName+"\n"+$ApVoucherType+"\n"+$ApTallyName
+	050: End Walk
+
+[Function: RefreshCallCounter]
+	000: Set: SVHttpCallCounter: $$SysInfo:SystemTimeHMS	
+
+[Function: FnImportVouchers]
+	Variable: SkippedVch 		: Number : 0
+	Variable: CreatedVch 		: Number : 0
+	Variable: IsLedgerAvailabilityVerified	: Logical: Yes
+	Variable: SelectedVchTypeObjId		: String	
+	Variable: SelectedVchTypeBaseType	: String
+	
+;	Local Formula: VtypName: ##VoucherTypeMapList[$$ListIndex:VoucherTypeMapList:##SelectedVchTypeObjId]
+	Local Formula: GetTallyVoucherTypeNameLcf: ##VoucherTypeMapList[$$ListIndex:VoucherTypeMapList:##SelectedVchTypeObjId]
+
+	00000: Set Object: (Company, ##SVCurrentCompany).
+	00010: Call: RefreshCallCounter
+	00100: Call: GetSelectedVoucherType
+	00200: Start Block	
+	00300:  LIST FILL : TallyLedgerMapList	: TallyLedgers 									: $name			: $parent
+	00400: 	LIST FILL : GroupMapList 	 			: APGroupsMapped								: $ApName 	: $APTallyName
+	00X00: 	LIST FILL : VoucherTypeMapList 	: ApVoucherTypesForSaveVoucher 	: $APObjId 	: $APTallyName
+	00500:	Call: APVerifyLedgerAvailabilityFn	
+	00600: End Block
+	00700: If: ##IsLedgerAvailabilityVerified = Yes
+	00800:	Walk Collection: ApVouchersDownload DataSource
+	00900: 	 START PROGRESS: ($$NumItems:data):"Import Auditplus Voucher":"Creating vouchers"
+	01000: 	 Walk Collection: data
+	01100:		SHOW PROGRESS: $$LoopIndex
+	01200: 		call : APSaveEachVoucher				
+	01300: 	 End Walk
+	01400: 	End Walk
+	01500: 	Msg Box: "Result": ($$String:##CreatedVch) +" "+@GetTallyVoucherTypeNameLcf+" Vouchers\n Successfully Created"
+	01600: 	If: ##SkippedVch > 0 
+	01700: 	 Msg Box: "Skipped Vouchers": ##SkippedVch
+	01800: 	End If		
+	01900: End If
+	
+	
+[Function: APSaveEachVoucher]
+	
+	Variable: GstLocationVar	: String
+	Variable: GstRegTypeVar		: String
+	Variable: TallyNameVar		:	String
+	Variable: ApGroupNameVar	: String
+	
+	Variable: CreateVch				: Logical : Yes
+	
+	Local Formula: GstRegTypeLcf: $$GetGstRegistrationTypeFn:##GstRegTypeVar
+	Local Formula: GstLocationLcf: $$GetGstLocationFn:##GstLocationVar
+	Local Formula: GetTallyVoucherTypeNameLcf: ##VoucherTypeMapList[$$ListIndex:VoucherTypeMapList:##SelectedVchTypeObjId]
+
+;	00100:	START BATCH POST : 100
+	00200:  SET		:	SVViewName 	: $$SysName:AcctgVchView	;; we set always ApTxnAccountOnly=Yes
+	00300:  NEW OBJECT 	: Voucher	
+	00400:  Set Value		: ApIsImported			: Yes
+	00410:  Set Value		: ApVoucherTypeName	: ##ApTxnVchTypeName
+	00500:  SET VALUE 	: Date 							: $date	
+	00600:  SET VALUE 	: VoucherTypeName 	: @GetTallyVoucherTypeNameLcf	;##VoucherTypeMapList[$$ListIndex:VoucherTypeMapList:##SelectedVchTypeObjId]
+	00700:  SET VALUE 	: VoucherNumber			: $voucher_no
+	00800: 	SET VALUE 	: PartyLedgerName 	: $party_name	
+	00900: 	SET VALUE 	: IsInvoice 				: No
+	01000: 	If: Not $$IsEmpty:$ref_no
+	01100: 		SET VALUE 	: Reference			: $ref_no	
+	01200: 	End If
+	01300: 	If: ( $base_voucher_type = "SALE" Or $base_voucher_type = "PURCHASE" Or $base_voucher_type = "CREDIT_NOTE" Or $base_voucher_type = "DEBIT_NOTE" )
+	01400: 		SET VALUE 	: GstRegistrationType		: "Unregistered/Consumer"
+	01500: 		If:  Not $$IsEmpty:$gst_reg_type
+	01600:  		SET		    : GstRegTypeVar				: $gst_reg_type	
+	01700:  		SET VALUE : GstRegistrationType	: @GstRegTypeLcf
+	01800: 		End If
+	01900: 	End If
+	02000: 	If: NOt $$IsEmpty:$gst_no
+	02100: 		Set Value	: PartyGstIn					: $gst_no
+	02200: 	End If	
+	02300: 	SET VALUE 	: BasicBuyerName			: $party_name	
+	02400: 	SET VALUE 	: PartyMailingName		: $party_name
+	02500: 	SET VALUE 	: StateName						: @@GetCompanyStateName
+	02600: 	SET VALUE 	: CountryOfResidence	: @@GetCompanyCountryName
+	02700: 	If: Not $$IsEmpty:$gst_location
+	02800:		SET		    : GstLocationVar		: $gst_location
+	02900: 		SET VALUE : PlaceOfSupply			: @GstLocationLcf
+	03000: 	Else	
+	03100: 		SET VALUE : PlaceOfSupply			: @@GetCompanyStateName
+	03200: 	End If
+	03300: 	If: Not $$IsEmpty:$description
+	03400: 		SET VALUE 	: NARRATION				: $description+", Imported From Auditplus"
+	03500: 	Else
+	03600: 		SET VALUE 	: NARRATION				: "Imported From Auditplus"
+	03700: 	End If
+	03800: 	SET VALUE 		: EFFECTIVEDATE		: $eff_date
+	03900: 	Walk Collection: ac_txns
+	
+	04000: 		If: Not $$ListFind:TallyLedgerMapList:$account_name
+	04100:			Msg Box: "Missing Auditplus Account" : "Account "+$account_name+" not found"
+	04200:  	 	Increment: SkippedVch
+	04300:  	 	Set: CreateVch: No
+	04400:			Break
+	04500:		End If
+	04600: 		If: Not $$ListFind:GroupMapList:$account_type_name
+	04700:			Msg Box: "Missing Auditplus Account Type" : "Account Group "+$account_type_name+" not found"
+	04800:  	 	Increment: SkippedVch
+	04900:  	 	Set: CreateVch: No
+	05000:			Break
+	05100:		End If
+	05200: 		Set: TallyNameVar: If $account_id != 20 Then $account_name Else "Profit & Loss A/c"
+	05300: 		Set: ApGroupNameVar: If $account_id != 20 Then $account_type_name Else "Primary" 
+;; creating ledger entries from actrns	
+	05400: 			INSERT COLLECTION OBJECT 				: LEDGERENTRIES
+	05500: 			SET VALUE 	: LedgerName 				: ##TallyNameVar
+	05600: 			SET VALUE 	: IsDeemedPositive 	: if $amount > 0 then Yes else No
+	05700: 			SET VALUE 	: Amount 						: $$AsAmount:$amount * -1 
+	05800: 			SET TARGET 	: ..
+	
+	05900:	End Walk
+	06000: 	SET VALUE   	: PersistedView 	: ##SVViewName
+	06100: 	If: ##CreateVch
+	06200: 		CREATE TARGET
+	06300: 		If: Not $$LastResult
+	06400: 			Msg Box: "Voucher Creating Error": $$LastError
+	06500: 		Else
+	06600: 			Increment: CreatedVch
+	06700: 		End if
+	06800: 	End if
+;	06900: 	END BATCH POST
+
+	
+	
+	

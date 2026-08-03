@@ -1,0 +1,22 @@
+[System: Variables]
+	LIST VARIABLE 	: VoucherTypeMapList 	: String
+	LIST VARIABLE 	: GroupMapList 				: String
+	LIST VARIABLE 	: TallyLedgerMapList 	: String
+
+
+	Variable:	ApUsername							: String
+	Variable:	ApPassword							: String
+	
+	Variable:	ApTxnFromDate						: Date
+	Variable:	ApTxnToDate							: Date
+	Variable: ApTxnVchTypeName				: String
+
+	Variable: ApTxnAccountOnly				: Logical	
+	Variable: ApTxnB2CSaleDaywise			: Logical
+	
+	Variable:	ApDelImpVchFromDate			: Date
+	Variable:	ApDelImpVchToDate				: Date
+	Variable: ApDelImpVchTypeName			: String
+	
+	Variable: ApMastersDownloadTables	: String
+	Variable: SVHttpCallCounter				: String	: "0"

@@ -1,0 +1,75 @@
+[Report: APVoucherTypeMap]
+	Title: "Auditplus Voucher Type Mapping"
+	Form: ApVoucherTypeMap
+	Object: Company: ##SVCurrentCompany
+
+[Form: APVoucherTypeMap]
+	Width: 100% Screen
+	Height: 100% Screen
+	Part: APVoucherTypeMapTitle, APVoucherTypeMap
+	Button: APDeleteALLVoucherTypes
+	
+	Local: Button: APDeleteALLVoucherTypes: Title: "DeleteAll"
+	
+	[Part:	ApVoucherTypeMapTitle]
+		Lines  	 	: APVoucherTypeMapTitle
+		Border  	: Column Titles
+	
+		[Line: APVoucherTypeMapTitle]	
+			Use     : AP VoucherType Map
+			Local   : Field : Default                   : Style : Small Bold
+			Local   : Field : Default                   : Skip  : Yes
+			Local   : Field : Default                   : Type  : String
+			Local   : Field : Default                   : Delete: Storage
+			Local   : Field : Default                   : Delete: Inactive
+
+;			Local   : Field : AP ObjId Field            : Info: "Id"
+			Local   : Field : AP Name Field			    		: Info: "Name"
+			Local   : Field : AP VoucherType Field     	: Info: "Base Voucher Type"
+			Local   : Field : AP TallyName Field	    	: Info: "Tally Voucher Type"	
+
+	[Part: ApVoucherTypeMap]
+		Line					: APVoucherTypeMap
+		Repeat				: APVoucherTypeMap: APVoucherTypes
+		Scroll				: Vertical
+		Common Border	: Yes
+		Border				:	Column Titles
+		
+		[Line: AP VoucherType Map]
+;			Field: 	AP ObjId Field, 
+			Fields: AP Name Field, AP VoucherType Field, AP TallyName Field
+			Local: 	Field : Default : Style : Small Bold
+				
+;			[Field: AP ObjId Field]
+;				Use			: NameField
+;				Border  : Thin Left
+;				Info		: $APObjId
+				
+			[Field: AP Name Field]
+				Use			: NameField		
+				Border  : Thin Left
+				Info		: $APName			
+				Width		: 50
+				
+						
+			[Field: AP VoucherType Field]
+				Use			: NameField
+				Border  : Thin Left
+				Info		: $APVoucherType			
+				Width		: 50
+
+			[Field: AP TallyName Field]
+				Use				: NameField
+				Border  	: Thin Left
+				Width			: 40
+				Storage		: APTallyName
+				Show Table: Always			
+				Table			: TallyVoucherTypes, NotApplicable	
+
+		
+
+
+
+
+
+

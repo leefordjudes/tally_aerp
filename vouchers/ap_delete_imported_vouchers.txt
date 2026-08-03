@@ -1,0 +1,84 @@
+[Report: APDeleteImportedVouchers]
+	Title		: "Delete Imported Vouchers"
+	Form		: APDelImpVch
+	Object	:	Company	: ##SVCurrentCompany
+	
+[Form: APDelImpVch]	
+	Parts				: Form SubTitle, APDelImpVch Body	
+	FullWidth   : No
+	Space Left	: 2
+	Space Right	: 2
+	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Delete Imported Voucher"
+	On 					: Form Accept: Yes: Call: ApDeleteVouchersFn:#ApDelImpVchFromDate:#ApDelImpVchToDate:#ApDelImpVchTypeName
+
+[Part: APDelImpVch Body]
+	Line:	APDelImpVch FromDate
+	Line:	APDelImpVch ToDate
+	Line:	ApDelImpVch TypeName
+				
+	[Line: APDelImpVch FromDate]
+		Fields: Medium Prompt, APDelImpVch FromDate
+		Space Bottom	: 0.4				
+		Local	:	Field	:	Medium Prompt	: Info		: "From Date"
+		
+		[Field: APDelImpVch FromDate]
+			Width			: 20
+			Max				: 250
+			Type			: Date
+			Storage		: ApDelImpVchFromDate
+			Modifies	: ApDelImpVchFromDate :Yes
+			Set As		: If $$IsEmpty:##ApDelImpVchFromDate Then $$SysInfo:SystemDate Else ##ApDelImpVchFromDate
+			Style   	: Normal Bold
+
+	[Line: ApDelImpVch ToDate]
+		Fields: Medium Prompt, ApDelImpVch ToDate
+		Space Bottom	: 0.4
+		Local	:	Field	:	Medium Prompt	: Info		: "To Date"
+		
+		[Field: APDelImpVch ToDate]	
+			Width			: 20
+			Max				: 250
+			Type			: Date
+			Storage		: ApDelImpVchToDate
+			Modifies	: ApDelImpVchToDate :Yes
+			Set As		: If $$IsEmpty:##ApDelImpVchToDate Then $$SysInfo:SystemDate Else ##ApDelImpVchToDate
+			Style   	: Normal Bold
+		
+	[Line: ApDelImpVch TypeName]
+		Fields: Medium Prompt, APDelImpVch TypeName
+		Space Bottom	: 1
+		Local	:	Field	:	Medium Prompt	: Info		: "Voucher Type"
+		
+		[Field: APDelImpVch TypeName]
+			Width				: 20
+			Max					: 250
+			Style   		: Normal Bold
+			Type				: String
+			Storage			: ApDelImpVchTypeName
+			Modifies		: ApDelImpVchTypeName : Yes
+			Set As			: If $$IsEmpty:##ApDelImpVchTypeName Then "" Else ##ApDelImpVchTypeName
+			Show Table	: Always
+			Table				: APVoucherTypeForDeleteMapped
+			Tooltip			: "Mapped voucher Type Names"
+		
+[Function: ApDeleteVouchersFn]
+	Parameter: ApDeleteVoucherFromDate	: Date 
+	Parameter: ApDeleteVoucherToDate		: Date 
+	Parameter: ApDeleteVoucherTypeName	: String
+	
+	0100: If:Not $$IsEmpty:($$NumItems:ApDeleteVouchersColl)
+	0200:  Query Box: "Sure to Delete Import Vouchers" : Yes: No
+	0300:  If: $$LastResult
+	0400:   Start Progress:($$NumItems:ApDeleteVouchersColl):"Deleting Imported vouchers"
+	0500:  	Start Batch Post:100
+	0600:  	Walk Collection: ApDeleteVouchersColl
+	0700:    Show Progress:$$LoopIndex:$$Sprintf:"Deleting voucher Date: %s, VchNo: %s, Imported: %s":($$DDMMYYYYDateFormat:$Date:"-"):$VoucherNumber:$ApIsImported
+;	00d1:  	 Msg Box: "Check Vouchers": "VoucherType: "+$VoucherTypeName+"\nVoucher Number: "+$VoucherNumber+"\nImported: "+($$String:$ApIsImported)
+	0800:  	 Set Target
+	0900:  	 Delete Target
+	1000:  	End Walk
+	1100:   End Batch Post
+	1200:   End Progress
+	1300:  End if
+	1400: End if
+	

@@ -1,0 +1,34 @@
+[Include: sys_udf.txt]
+[Include: sys_vars.txt]
+[Include: sys_formula.txt]
+[Include: ap_collections.txt]
+[Include: utils.txt]
+
+[#Menu: Gateway of Tally]
+	Add: Key Item	: After: @@LocIndentUtilities	: "AERP Integration"	: E : Menu	: AERP Integration
+	
+[Menu: AERP Integration]
+	Key Item: "Configuration"							: C : Alter	:	APConfiguration 
+	Key Item: "Login"											: L : Alter	: APLogin
+	Key Item: "Masters"										: M : Menu	:	APMasters
+	Key Item: "Import Vouchers"						: I : Alter	:	APImportVouchers
+	Key Item: "Delete Imported Vouchers"	: D : Alter	:	APDeleteImportedVouchers
+	Button: ViewApConfiguration
+
+[Function: ViewApConfiguration]
+	100: Set Object: (Company, ##SVCurrentCompany).	 ; current object
+	200: Msg Box: "Ap Configuration": "Host: "+$ApHost+"\n\nBookBegin: "+($$String:$ApBookBegin)
+
+[Button: ViewApConfiguration]
+	Key: F4
+	Action: Call: ViewApConfiguration
+	Title: "View Configuration"		
+	
+[Include: ap_configuration.txt]
+[Include: ap_login.txt]
+[Include: masters/masters.txt]
+[Include: masters/verify_ledger_availability.txt]
+[Include: vouchers/add_fields_to_vouchers.txt]
+[Include: vouchers/fn_import_vouchers.txt]
+[Include: vouchers/ap_import_vouchers.txt]
+[Include: vouchers/ap_delete_imported_vouchers.txt]

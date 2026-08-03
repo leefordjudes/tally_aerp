@@ -1,0 +1,78 @@
+[Collection: APGroups]
+	Type				: APGroups						:	Company			;;APGroups is an aggregate system udf variable
+;	Filter			: NOT FilterMapped	;; FilterMapped is a sys formula
+	Child of  	: ##SVCurrentCompany
+
+[Collection: APVoucherTypes]
+	Type				: APVoucherTypes			:	Company			;;APVoucherTypes is an aggregate system udf variable
+	Child of  	: ##SVCurrentCompany	
+
+[Collection: APLedgers]
+	Type				: APLedgers						:	Company			;;APLedgers is an aggregate system udf variable
+;	Filter			: NOT FilterMapped
+	Child of    : ##SVCurrentCompany
+	
+[Collection: ApImportedAccounts]
+	Type				: Ledger							;;Ledger - taken from tally internal
+	Title				: "Auditplus Accounts"
+	Filter			: ImportedAccountsFlt
+	Format			: ApId, 10	
+	Format			: Name, 40
+	Format			: Parent, 40		
+	
+[Collection: APGroupsMapped]		;; used in APVerifyLedgerAvailabilityFn
+	Use				: ApGroups
+	Format		: ApName, 50
+	Format		: $APTallyName, 50
+
+[Collection: APVoucherTypesMapped]
+	Use				: APVoucherTypes
+	Filter		: VchTypeMappedFlt
+	Title			: "Auditplus VoucherTypes - Tally VoucherTypes"	
+	Format		: $APName, 20
+	Format		: $APTallyName, 20
+
+
+[Collection: SelectedApVoucherTypesForImport] ;; not used to show, so title removed, others added
+  Use				: APVoucherTypes
+	Filter		: VchTypeNameFlt 
+	Fetch 		: APObjId, ApName, APVoucherType, ApTallyName
+	
+[Collection: ApVoucherTypesForSaveVoucher]
+  Use				: APVoucherTypes
+	Filter		: VchTypeMappedFlt
+	Format		: $APObjId, 30
+	Format		: $APTallyName, 30
+	
+[Collection: APVoucherTypeForDeleteMapped]
+	Use			  : APVoucherTypes
+	Filter		: VchTypeMappedFlt
+	Title		  : "Tally VoucherTypes"
+	Format		: $APTallyName, 20
+	
+[Collection: ApDeleteVouchersColl]
+	Type		  : Vouchers
+	Filter		: ApDelImpVchByDateFlt
+	Format		: $VoucherTypeName, 40		
+	Format		: $VoucherNumber, 40	
+	Format		: $ApIsImported, 10
+	Format		: $Date, 10
+		
+	
+;; Collections used from Tally Start =====================
+[Collection: TallyLedgers]
+	Type				: Ledger							;;Ledger - taken from tally internal
+	Title				: "Tally Ledgers"
+	Format			: Name, 40
+	Format			: $Parent, 40		
+	
+[Collection: TallyVoucherTypes]
+	Type		: Voucher Type						;;Voucher Type - taken from tally internal
+	Title		: "Tally Voucher Types"
+	Format	: $Name, 40	
+
+[Collection: TallyGroups]
+	Type: Group												;;Group - taken from tally internal
+	Title: "Tally Group"
+	Format	: $Name, 40	
+;; Collections used from Tally End =====================	

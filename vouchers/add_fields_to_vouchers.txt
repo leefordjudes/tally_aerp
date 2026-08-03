@@ -1,0 +1,35 @@
+[#Part: VCH Narration]
+	Add:Line:ApIsImported
+
+[Line:ApIsImported]
+	Field: ApIsImported, ApVoucherTypeName
+		
+[Field:ApIsImported]
+	Type			:	Logical
+	Storage		:	ApIsImported
+	Info			: If $$IsEmpty:$ApIsImported Then No Else $ApIsImported
+	Invisible	: Yes
+	
+[Field:ApVoucherTypeName]
+	Type			:	String
+	Storage		:	ApVoucherTypeName
+	Info			: $ApVoucherTypeName
+	Invisible	: Yes
+
+	
+	
+;; Add Id, IsImported 
+[#Part: MST LED Details]
+	Add:Line:MstLedApInfo
+
+[Line:MstLedApInfo]
+	Field: ApIsImported, ApId
+					
+	[Field:ApId]
+		Use 			: Number Field
+		Type			:	Number
+		Storage		:	ApId
+		Info			: $ApId
+		Invisible	: If $ApId > 0 Then No Else Yes
+
+	

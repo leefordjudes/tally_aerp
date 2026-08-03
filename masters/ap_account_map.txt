@@ -1,0 +1,55 @@
+[Report: APAccountMap]
+	Title: "Auditplus Account Mapping"
+	Form: ApAccountMap
+	Object: Company: ##SVCurrentCompany
+
+[Form: APAccountMap]
+	Width: 100% Screen
+	Height: 100% Screen
+	Part: APAccountMapTitle, APAccountMap
+	Key: Create Ledger	
+	
+	[Part:	ApAccountMapTitle]
+		Lines  	 	: APAccountMapTitle
+		Border  	: Column Titles
+	
+		[Line: APAccountMapTitle]	
+			Use     : APAccountMap
+			Local   : Field : Default                   : Style : Small Bold
+			Local   : Field : Default                   : Skip  : Yes
+			Local   : Field : Default                   : Type  : String
+			Local   : Field : Default                   : Delete: Storage
+			Local   : Field : Default                   : Delete: Inactive
+
+			Local   : Field : APId Field            		: Info: "Ap Id"
+			Local   : Field : APAccountName Field	   		: Info: "Tally Name"
+			Local   : Field : APAccountType Field     	: Info: "Tally Group"
+
+	[Part: ApAccountMap]
+		Line					: APAccountMap
+		Repeat				: APAccountMap: ApImportedAccounts
+		Scroll				: Vertical
+		Common Border	: Yes
+		Border				:	Column Titles
+		
+		[Line: APAccountMap]
+			Fields: APId Field, APAccountName Field, ApAccountType Field
+			Local: 	Field : Default : Style : Small Bold
+				
+			[Field: APId Field]
+				Use			: NameField
+				Border  : Thin Left
+				Info		: $APId
+				Width		: 20
+				
+			[Field: APAccountName Field]
+				Use			: NameField		
+				Border  : Thin Left
+				Info		: $Name			;; taken from tally ledger
+				Width		: 50				
+						
+			[Field: APAccountType Field]
+				Use			: NameField
+				Border  : Thin Left
+				Info		: $Parent
+				Width		: 50

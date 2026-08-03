@@ -1,0 +1,37 @@
+[System: Formula]
+;;===== Used to make http request
+	APLoginUrl			: $$String:(($ApHost:Company:##SVCurrentCompany)+"/api/login")
+	APExecuteUrl		: $$String:(($ApHost:Company:##SVCurrentCompany)+"/api/execute")
+	APAggregateUrl	: $$String:(($ApHost:Company:##SVCurrentCompany)+"/api/aggregate")
+	
+	
+	
+	APExecuteUrlWithId: @@APExecuteUrl + "?id=" + ##SVHttpCallCounter
+	APAggregateUrlWithId: @@APAggregateUrl + "?id=" + ##SVHttpCallCounter
+
+;;===== Auth related information
+	APAuthToken		: $ApAuthToken:Company:##SVCurrentCompany
+	APBookBegin		: $ApBookBegin:Company:##SVCurrentCompany
+	
+;;===== Filters ;; used to filter to create collection
+	VchTypeMappedFlt: NOT $$IsEmpty:$APTallyName	;; used in ApVoucherTypesMapped Collection
+	VchTypeNameFlt: (NOT $$IsEmpty:$APTallyName) AND ($APName = ##ApTxnVchTypeName)		;; used in APVoucherTypesMapped, for import vouchers
+	ImportedAccountsFlt: $ApIsImported AND $ApId > 0	;; used to list/delete imported accounts
+
+;;==== Filter imported vouchers by date for delete
+	ApDelImpVchByDateFlt: $ApIsImported = Yes And +
+		($Date >= ##ApDelImpVchFromDate) And +
+		($Date <= ##ApDelImpVchToDate) And +
+		($VoucherTypeName = ##ApDelImpVchTypeName)
+
+;;===== Used to create voucher in tally using downloaded voucher
+	GetCompanyStateName: $(Company, ##SVCurrentCompany).StateName
+	GetCompanyCountryName: $(Company, ##SVCurrentCompany).CountryName
+	
+;;===== Error Messages
+;;----- Login Error Messages
+	UnameEmtyErr: "Username can not be empty"
+	PwdEmtyErr: "Password can not be empty"
+
+
+	

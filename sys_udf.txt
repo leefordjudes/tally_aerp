@@ -1,0 +1,31 @@
+[System: UDF]
+;; string datatype
+	APHost							:	String	: 25001
+	APAuthToken					: String	: 25002
+	
+	APTallyName					:	String	: 25003	
+	APName							: String	: 25004
+	APVoucherType				: String	: 25005
+	APObjId							: String	: 25006
+	APAccountType			  :	String	: 25007
+	
+	APVoucherTypeName		: String	: 25008		;; added as extra field in voucher
+
+
+	
+;; date datatype
+	ApBookBegin					: Date		: 25001	
+
+	
+;; number datatype
+	APId								: Number	: 25001
+	MstApId							: Number	: 25002
+
+;; aggregate datatype
+	APVoucherTypes			:	Aggregate	: 25001
+	APGroups						:	Aggregate	: 25002
+	APLedgers						:	Aggregate	: 25003
+
+;; boolean / logical datatype 
+	ApIsImported				: Logical		: 25001		;; added as extra field in voucher
+	MstApIsImported			: Logical		: 25002

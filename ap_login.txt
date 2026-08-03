@@ -1,0 +1,130 @@
+[Report: APLogin]
+	Title	: Login Auditplus ERP
+	Form	: APLogin
+	Object	: Company:##SVCurrentCompany
+	
+[Form: APLogin]	
+	Parts: Form SubTitle, APLoginBody	
+	FullWidth   : No
+	Space Left	: 3
+	Space Right	: 3
+	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Login Auditplus"
+	Local       : Field : Form SubTitle : Style: Large Bold
+	On			: Form Accept: Yes: Call: APLoginSubmit:##APUsername:##APPassword	
+	
+[Part: APLoginBody]
+	Lines:	APUsername, APPassword
+	
+	[Line: APUsername]
+		Fields: Medium Prompt, APUsername
+		Space Bottom	: 0.5
+		Local	:	Field	:	Medium Prompt	: Info		: "Username"
+		
+		[Field: APUsername]
+			Width	: 30
+			Max		: 100
+			Type	: String
+			Style   : Normal Bold			
+			Validate: NOT $$IsEmpty:$$Value
+			Control	: UnameEmtyErr: ($$IsEmpty:$$Value)
+			Storage		: ApUsername
+			Modifies  : ApUsername : Yes	
+			Tooltip : "Enter Username, Username can not be empty" 
+
+	[Line: APPassword]
+		Fields: Medium Prompt, APPassword
+		Space Bottom	: 1
+		Local	:	Field	:	Medium Prompt	: Info		: "Password"
+		
+		[Field: APPassword]
+			Width	: 30
+			Max		: 100
+			Type	: String
+			Style   : Normal Bold
+			Validate: NOT $$IsEmpty:$$Value
+			Control	: PwdEmtyErr: ($$IsEmpty:$$Value)
+			Storage		: ApPassword
+			Modifies  : ApPassword : Yes	
+			Tooltip : "Enter Password, Password can not be empty" 
+
+;;===== Functions ==================================================================
+
+[Function: APLoginSubmit]
+	Parameter: ApUsername: String
+	Parameter: ApPassword: String
+	
+	00100: If: $$IsEmpty:$ApHost Or $$IsEmpty:$ApBookBegin
+	00200: 	Msg Box: "Missing Configuration": "Host/BookBegin not filled"
+	00300: End If
+
+	00400: Walk Collection: ApLogin DataSource
+	00500: 	Set Target: (Company, ##SvCurrentCompany).
+	00600:  If: $status = "failure"
+	00700:  	Reset Value: ApAuthToken
+	00800: 		Msg Box: "Response": "Login Failed\n\n" + $error
+	00900: 	End If	
+	01000: 	If: $status = "success"
+	01100:  	Set Value: ApAuthToken : $data	
+	01200: 		Msg Box: "Response": "Login Success\n\n Token Received \n\n" + $data
+	01300: 	End If
+	01400:  Alter Target
+	01500: End Walk	
+
+;;===== DataSource ===============================================================
+
+;; Ap Login Request and Response
+[Collection: ApLogin DataSource]
+	Data Source		: HTTP JSON: @@APLoginUrl: UTF8
+	;; if we want to access entire response object, comment current below line
+	;JSON Object Path: "data:1"   ;; access specific field in response object
+	RemoteRequest	: ApLogin Request: UTF8
+;;----------------------------Tally To Ap Login Request Start---------------------	
+[Report: ApLogin Request]
+	Form: ApLogin Request
+	Plain JSON: Yes
+		
+[Form: ApLogin Request]
+	Delete: XMLTag
+	Full Object: Yes
+	Belongs To: Yes
+	Part: ApLogin Request Scope, ApLogin Request Credential
+	
+[Part: ApLogin Request Scope]
+	Line: ApLogin Request Scope
+	Scroll: Vertical
+	
+	[Line: ApLogin Request Scope]
+		Field: ApLogin Request Scope
+			
+			[Field: ApLogin Request Scope]
+				Use: Name Field
+				JSONTag: "scope"
+				Set as: "member"
+				
+[Part: ApLogin Request Credential]
+	Line: ApLogin Request Credential
+	JSONTag: "credential"
+	Scroll: Vertical
+
+	[Line: ApLogin Request Credential]		
+		Field: ApLogin Request Username
+		Field: ApLogin Request Password		
+			
+			[Field:ApLogin Request Username]
+				Type: String
+				JSONTag: "name"	
+				Set As: ##ApUsername
+				
+			[Field: ApLogin Request Password]
+				Type: String
+				JSONTag: "pass"
+				Set as: ##ApPassword			
+;;----------------------------Ap Login Request End---------------------	
+;; request data
+;; {
+;;	"scope": "member",
+;;	"credential": {
+;;     	"name":"##ApUsername", ;; function parameter	
+;;     	"pass":"##ApPassword", ;; function parameter
+;; 		}
+;; }

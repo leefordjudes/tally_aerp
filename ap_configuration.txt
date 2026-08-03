@@ -1,0 +1,56 @@
+[Report: APConfiguration]
+	Title: Auditplus Configuration
+	Form: APConfiguration
+	Object	:	Company	:	##SVCurrentCompany
+	
+[Form: APConfiguration]	
+	Parts: Form SubTitle, APConfigurationBody	
+	FullWidth   : No
+	Space Left	: 3
+	Space Right	: 3
+	Local       : Field : Form SubTitle : Info  : $$LocaleString:"Auditplus Configuration"
+	Local       : Field : Form SubTitle : Style: Large Bold
+	Button			: ResetApConfiguration
+	
+	
+[Part: APConfigurationBody]
+	Lines:	APHost, APBookBegin
+	
+	[Line: APHost]
+		Fields: Medium Prompt, APHost
+		Space Bottom	: 0.4				
+		Local	:	Field	:	Medium Prompt	: Info		: "Host"
+		
+		[Field: APHost]
+			Width	: 40
+			Max		: 250
+			Storage	: APHost
+			Style   : Normal Bold
+			Case    : Lower Case
+					
+	[Line: APBookBegin]
+		Fields: Medium Prompt, APBookBegin
+		Space Bottom	: 0.4
+		Local	:	Field	:	Medium Prompt	: Info		: "BookBegin"
+		
+		[Field: APBookBegin]
+			Width	: 40
+			Max		: 250
+			Storage	: APBookBegin
+			Type	: Date
+			Style   : Normal Bold
+
+[Function: ResetApConfiguration]
+	100: Set Object: (Company, ##SVCurrentCompany).	 ; current object
+	200: Set Target
+	300: Reset Value: ApHost
+	400: Reset Value: ApBookBegin
+	500: Alter Target
+	
+
+[Button: ResetApConfiguration]
+	Key: F4
+	Action: Call: ResetApConfiguration
+	Title: "Reset Configuration"		
+	
+

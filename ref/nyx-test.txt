@@ -1,0 +1,62 @@
+[
+        {
+          "account_id": 308,
+          "account_name": "MR.RAMA KRISHNAN",
+          "account_type_name": "Sundry Debtors",
+          "amount": 7803
+        },
+        {
+          "account_id": 539,
+          "account_name": "RAMAKRISHNAN ELTL",
+          "account_type_name": "Sundry Debtors",
+          "amount": 469
+        },
+        {
+          "account_id": 2,
+          "account_name": "Sales",
+          "account_type_name": "Sale",
+          "amount": -14954.1
+        },
+        {
+          "account_id": 164,
+          "account_name": "EFT MACHINE 1",
+          "account_type_name": "EFT Account",
+          "amount": 784
+        },
+        {
+          "account_id": 4,
+          "account_name": "CGST Payable",
+          "account_type_name": "Duties And Taxes",
+          "amount": -383.2
+        },
+        {
+          "account_id": 12,
+          "account_name": "Rounded Off",
+          "account_type_name": "Indirect Income",
+          "amount": 0.5
+        },
+        {
+          "account_id": 163,
+          "account_name": "UCO BANK",
+          "account_type_name": "Bank Account",
+          "amount": 2120
+        },
+        {
+          "account_id": 578,
+          "account_name": "KANNAN",
+          "account_type_name": "Sundry Debtors",
+          "amount": 587
+        },
+        {
+          "account_id": 1,
+          "account_name": "Cash",
+          "account_type_name": "Cash",
+          "amount": 3957
+        },
+        {
+          "account_id": 5,
+          "account_name": "SGST Payable",
+          "account_type_name": "Duties And Taxes",
+          "amount": -383.2
+        }
+      ].filter(|x| x.amount < 0).fold(0, |s,x| s+x.amount).round(2);

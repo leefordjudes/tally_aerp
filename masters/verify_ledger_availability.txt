@@ -1,0 +1,179 @@
+[#Menu: AERP Integration]
+	Add : Key Item: At Beginning : "Verify Ledger Availability"	: V : Call	:	APVerifyLedgerAvailabilityTestFn
+	
+[Function: APVerifyLedgerAvailabilityTestFn]
+	Variable: IsLedgerAvailabilityVerified	: Logical: Yes
+
+	010: LIST FILL : TallyLedgerMapList		: TallyLedgers 		: $name		: $parent
+	020: LIST FILL : GroupMapList 	 			: APGroupsMapped	: $ApName : $APTallyName
+	030: If: $$IsEmpty:##ApTxnVchTypeName
+	040:  Msg Box: "VoucherType": "Voucher type not selected"
+	050:  Break
+	060: End If
+	070: Call: APVerifyLedgerAvailabilityFn
+
+[Function: GetGstLocationFn]
+		Parameter	: ApGstLocation	: String
+		Variable	: Out						: String
+		Returns		: String		
+
+	0100: If: ##ApGstLocation = "TamilNadu"
+	0200:  	Set: Out: "Tamil Nadu"	
+	0300: End If
+	0400: If: ##ApGstLocation != "TamilNadu"
+	0500:  	Set: Out: ##ApGstLocation
+	0600: End If
+	1000: Return: ##Out
+
+[Function: GetGstRegistrationTypeFn]
+		Parameter	: RegType	: String
+		Variable	: Out			: String
+		Returns		: String		
+
+	0100: If: ##RegType = "UNREGISTERED"
+	0200:  	Set: Out: "Unregistered/Consumer"	
+	0300: End If
+	0400: If: ##RegType = "REGULAR"
+	0500:  	Set: Out: "Regular"
+	0600: End If
+	0700: If: ##RegType = "COMPOSITE"
+	0800:  	Set: Out: "Composition"
+	0900: End If
+	1000: Return: ##Out	
+
+	
+[Function: APVerifyLedgerAvailabilityFn]
+/*
+if account found with account_type_name='Profit & Loss' then use account 'Profit & Loss A/c'
+In APlus account_id=20 having account_type_name='Profit & Loss', in that place use account name as 'Profit & Loss A/c'
+*/
+	Variable	: ErrorMsg				: String
+	
+	Variable	: MissingLedgers	: Number: 0
+	Variable	: SkippedLedgers	: Number: 0
+	Variable	: ApLedGroupName	: String	
+	Variable	: PlaceOfSupply		: String
+	Variable	: GstLocationVar	: String
+	Variable	: GstRegTypeVar		: String
+	
+	Local Formula : BBYR: $$YearOfDate:@@ApBookBegin
+	Local Formula : BBZM: $$ZeroFill:($$MonthOfDate:@@ApBookBegin):2
+	Local Formula : BBZD: $$ZeroFill:($$DayofDate:@@ApBookBegin):2
+	
+	Variable: ApApplicableFrom : String: ($$String:@BBYR)+($$String:@BBZM)+($$String:@BBZD)
+	
+	Local Formula: TallyGroupNameLcf: ##GroupMapList[$$ListIndex:GroupMapList:##ApLedGroupName]
+		
+	
+	Local Formula: GstLocationLcf: $$GetGstLocationFn:##GstLocationVar
+	Local Formula: GstRegTypeLcf: $$GetGstRegistrationTypeFn:##GstRegTypeVar
+
+	00100:	If: $$IsEmpty:@@ApBookBegin
+	00200:  	Msg Box: "Missing BookBegin": "BookBegin not filled in Configuration Page"
+	00300:  	Break
+	00400:  End If
+	00700:	Set: ApMastersDownloadTables: "account"
+	00800: 	Call: RefreshCallCounter
+	00900:	Walk Collection: ApMastersDownload DataSource
+	01000: 		Start Progress: ($$NumItems:accounts):"Verifying Ledger Availability"
+	01100:    Walk Collection: accounts
+	01200:  		If: ##IsLedgerAvailabilityVerified = Yes
+	01300:  		  Set: ApLedGroupName : ""
+	01400:  		  Set: PlaceOfSupply  : ""
+	01500:  		  Set: ApLedGroupName: $account_type_name
+;	000d1:  Msg Box: "Debug":($$String:$$LoopIndex)+"\nGroupName: "+##ApLedGroupName+"\nTallyGroupName: "+@TallyGroupNameLcf
+	01600:	 		  If: $id != 20 And $$IsEmpty:@TallyGroupNameLcf	
+	01700:  				Msg Box: "Missing Account Group Mapping": "AccountName:"+$name+"\n AccountType: "+##ApLedGroupName+" was not mapped to Tally Group.\n Kindly map it and continue."
+	01800:					Set: IsLedgerAvailabilityVerified: No
+	01900:  				Break
+	02000:	 		  End If
+	02100: 	  	  If: $$ListFind:TallyLedgerMapList:$name
+	02200:    	    Show Progress:$$LoopIndex:$$Sprintf:"Ledger %s Found":$name
+	02300: 	  	  Else
+	02400: 	  	    Show Progress:$$LoopIndex:$$Sprintf:"Ledger %s Not Found, Creating Ledger...":$name
+
+	02500:	 		  	If: $id = 20 ;; $account_type_name != "Profit & Loss"
+	02600:  					Continue
+	02700:	 		  	End If
+	02800:	  	  	Increment: MissingLedgers
+
+	02900:  		  	New Object: Ledger
+	02910:	 		  	Set Value: ApIsImported	: Yes
+	02920:	 		  	Set Value: ApId					: $id	
+	03000:	 		  	Set Value: Name					: $name
+	03100:	 		  	Set Value: Parent				: @TallyGroupNameLcf
+		
+	03200:	 		  	If: Not $$IsEmpty:$pan_no	
+	03300:  		  		Set Value: INCOMETAXNUMBER	: $pan_no
+	03400:	 		  	Else 
+	03500:	 		  		If: Not $$IsEmpty:$gst_no
+	03600:  		  				SET VALUE: INCOMETAXNUMBER	: $$Substr:$gst_no:3:10
+	03700:	 		  		End If
+	03800:	 		  	End If					
+			
+									;; mailing details object
+	03900:	 		  	Insert Collection Object: LedMailingDetails
+	04000:	 		  	Set Value:	APPLICABLEFROM 	: 	##ApApplicableFrom 
+	04100:	 		  	Set Value: 	MailingName		:	$name
+		
+	04200:	 		  	If: Not $$IsEmpty:$address
+	04300:	 		  		Insert Collection Object: Address
+	04400:	 		  		Set Value: 	Address	:	$address
+	04500:	 		  		Set Target: ..
+	04600:	 		  	End If
+		
+	04700:	 		  	If: Not $$IsEmpty:$gst_location Or Not $$IsEmpty:$country
+	04800:	 		  		Set Value: 	Country			:	"India"
+	04900:	 		  	End If
+			
+	05000:			  	If: Not $$IsEmpty:$gst_location
+	05010:						SET		     : GstLocationVar	: $gst_location
+	05100: 			  		SET   	   : PlaceOfSupply  : @GstLocationLcf
+	05200: 			  		SET VALUE  : State					: @GstLocationLcf
+	05300:			  	End If
+		
+	05800:	 		  	Set Target: ..
+						
+									;; ledger gst registration details
+	05900:	 		  	Insert Collection Object: LedGstRegDetails
+	06000:	 		  	Set Value:	APPLICABLEFROM 		: 	##ApApplicableFrom 		
+	;; below check is only do for account, not for voucher
+	06100:			  	If: Not $$IsEmpty:$gst_reg_type And ($gst_reg_type != "REGULAR" And $gst_reg_type = "UNREGISTERED" And $gst_reg_type = "COMPOSITE")
+	06200: 			  		Msg Box: "Unsupported Gst Registration Type Found":"Account Name: "+$name+"\nAccount Type: "+$gst_reg_type
+	06300:						Set: IsLedgerAvailabilityVerified: No
+	06400:  					Break
+	06500:			  	End If
+	06600:			  	If: Not $$IsEmpty:$gst_reg_type
+	06700:						SET		    	: GstRegTypeVar				: $gst_reg_type
+	06800: 			  		SET VALUE		: GstRegistrationType	: @GstRegTypeLcf
+	06900:			  	End If
+	
+	07000:	 		  	If: Not $$IsEmpty:##PlaceOfSupply
+	07100:	 		  		Set Value: 	PLACEOFSUPPLY		:	##PlaceOfSupply
+	07200:	 		  	End If
+	07300:	 		  	If: Not $$IsEmpty:$gst_no
+	07400:	 		  		Set Value: 	GSTIN				:	$gst_no
+	07500:	 		  	End If
+	07600:	 		  	Set Target: ..
+							
+	07700:  		  	Create Target
+	
+	00000: 		If: Not $$LastResult
+	00001:      Set: ErrorMsg: "Id:"+($$String:$id)+", Name: "+$name+", Group: "+@TallyGroupNameLcf
+	00002: 			Log: "Info: "+##ErrorMsg
+	00003: 			Msg Box: "Account Creating Error": ##ErrorMsg
+;	00002:			Break
+	00004:     Increment: SkippedLedgers
+;	00002:			Continue
+	00005: 		End if	
+
+	07800:    	  End If
+	07910:			End If	
+	08000:	  End Walk
+	08100:    End Progress
+	08200:	End Walk
+	08300:	Set: ApMastersDownloadTables: ""
+	08310: 	Log: "Info: Verify Ledger Result: Skipped "+($$String:##SkippedLedgers)+", New "+($$String:##MissingLedgers)
+	08400:	If: ##MissingLedgers > 0
+	08500:	 	Msg Box: "Verify Ledger Result":"Skipped "+($$String:##SkippedLedgers)+", New "+($$String:##MissingLedgers)	
+	08600:  End if

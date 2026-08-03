@@ -1,0 +1,8 @@
+;; Ref: https://tdlexpert.com/index.php?threads/some-useful-string-functions.4187/
+[Function:Substr]	
+	Parameter:sSource:String
+	Parameter:nStart:Number
+	Parameter:nLen:Number
+	Returns:String
+
+	100: Return: $$StringPart:##sSource:(##nStart-1):##nLen

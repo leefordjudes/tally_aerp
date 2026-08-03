@@ -1,0 +1,6 @@
+@  - local formula
+@@ - system formula
+$  - object field
+$$ - function
+## - variable in current scope
+#  - modifier
