@@ -1,16 +1,16 @@
-[#Menu: AERP Integration]
-	Add : Key Item: At Beginning : "Verify Ledger Availability"	: V : Call	:	APVerifyLedgerAvailabilityTestFn
-	
-[Function: APVerifyLedgerAvailabilityTestFn]
-	Variable: IsLedgerAvailabilityVerified	: Logical: Yes
-
-	010: LIST FILL : TallyLedgerMapList		: TallyLedgers 		: $name		: $parent
-	020: LIST FILL : GroupMapList 	 			: APGroupsMapped	: $ApName : $APTallyName
-	030: If: $$IsEmpty:##ApTxnVchTypeName
-	040:  Msg Box: "VoucherType": "Voucher type not selected"
-	050:  Break
-	060: End If
-	070: Call: APVerifyLedgerAvailabilityFn
+;[#Menu: AERP Integration]
+;	Add : Key Item: At Beginning : "Verify Ledger Availability"	: V : Call	:	APVerifyLedgerAvailabilityTestFn
+;	
+;[Function: APVerifyLedgerAvailabilityTestFn]
+;	Variable: IsLedgerAvailabilityVerified	: Logical: Yes
+;
+;	010: LIST FILL : TallyLedgerMapList		: TallyLedgers 		: $name		: $parent
+;	020: LIST FILL : GroupMapList 	 			: APGroupsMapped	: $ApName : $APTallyName
+;	030: If: $$IsEmpty:##ApTxnVchTypeName
+;	040:  Msg Box: "VoucherType": "Voucher type not selected"
+;	050:  Break
+;	060: End If
+;	070: Call: APVerifyLedgerAvailabilityFn
 
 [Function: GetGstLocationFn]
 		Parameter	: ApGstLocation	: String
