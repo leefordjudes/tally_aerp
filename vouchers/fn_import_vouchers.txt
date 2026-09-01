@@ -118,9 +118,7 @@
 	05600: 			SET VALUE 	: IsDeemedPositive 	: if $amount > 0 then Yes else No
 	05700: 			SET VALUE 	: Amount 						: $$AsAmount:$amount * -1 
 	
-	05700a:			Msg Box: "ledger name": ##TallyNameVar
 	05701:    	Walk Collection: bank_allocations	
-	05701a:			 Msg Box: "ba": $particulars
 	05702: 		   INSERT COLLECTION OBJECT 				: BANKALLOCATIONS	
  	05703:			 SET VALUE: Name									: $$MakeUniqueID
 	05704:			 SET VALUE: UniqueReferenceNumber	: $$MakeTallyUniqueID
