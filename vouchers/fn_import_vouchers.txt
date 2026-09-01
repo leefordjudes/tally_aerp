@@ -117,8 +117,44 @@
 	05500: 			SET VALUE 	: LedgerName 				: ##TallyNameVar
 	05600: 			SET VALUE 	: IsDeemedPositive 	: if $amount > 0 then Yes else No
 	05700: 			SET VALUE 	: Amount 						: $$AsAmount:$amount * -1 
-	05800: 			SET TARGET 	: ..
 	
+	05700a:			Msg Box: "ledger name": ##TallyNameVar
+	05701:    	Walk Collection: bank_allocations	
+	05701a:			 Msg Box: "ba": $particulars
+	05702: 		   INSERT COLLECTION OBJECT 				: BANKALLOCATIONS	
+ 	05703:			 SET VALUE: Name									: $$MakeUniqueID
+	05704:			 SET VALUE: UniqueReferenceNumber	: $$MakeTallyUniqueID
+	05705:			 SET VALUE: Date									: $date	;;	"20260831"	;;$date
+ 	05706:			 SET VALUE: PaymentMode						: $$SysName:Transacted  ;; "Transacted"
+	05707: 		   If: NOt $$IsEmpty:$bank_date 	
+	05708:			 	SET VALUE: BankersDate					: $bank_date ;;"20260831"	;;$bank_date
+	05709:			 End If
+	05710: 		   If: NOt $$IsEmpty:$inst_date
+ 	05711:			  SET VALUE: InstrumentDate				: $inst_date ;; "20260831"	;; $inst_date
+	05712: 		   End If
+	05713: 		   If: NOt $$IsEmpty:$txn_type
+	05714: 		    If: $txn_type = "CHEQUE"
+ 	05715:			   SET VALUE: TransactionType				: "Cheque"    ;;$txn_type ;;$$LocaleString:"Cheque"
+	05716:        Else
+	05717:			 	 SET VALUE: TransactionType				: "Same Bank Transfer"    ;;"Same Bank Transfer" OR "Inter Bank Transfer"	
+	05718: 		    End If
+	05719: 		   End If
+	05720: 		   If: NOt $$IsEmpty:$inst_no
+ 	05721:			  SET VALUE: InstrumentNumber			: $inst_no ;; "123456" 		;;$inst_no			
+	05722: 		   End If 	
+	05723:			 SET VALUE: Narration							: "Imported from auditplus" 				
+
+;	05724:			 SET VALUE: BankName							: ##TallyNameVar ;;"AXIS BANK" ;;$account_name
+	05725:			 SET VALUE: Amount								: $$AsAmount:$$Abs:$amount
+; 0571X:			 SET VALUE: PaymentFavouring			: "MEDICHEMS"
+; 0571X:		   SET VALUE: BankPartyName					: "MEDICHEMS"	;;$particulars			
+;	0571X:			 SET VALUE: ChequeCrossComment		: "A/c Payee" 	
+;	05718:			 SET VALUE: Status								: "No" 		
+;	05720:			 SET VALUE: BankManualStatus			: "Reconciled"
+	05726: 			 SET TARGET 	: ..
+ 	05727:			End Walk 	
+	
+	05800: 			SET TARGET 	: ..
 	05900:	End Walk
 	06000: 	SET VALUE   	: PersistedView 	: ##SVViewName
 	06100: 	If: ##CreateVch

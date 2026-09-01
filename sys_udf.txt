@@ -1,7 +1,7 @@
 [System: UDF]
 ;; string datatype
 	APHost							:	String	: 25001
-	APAuthToken					: String	: 25002
+	APAuthToken					: String	: 25002 : 9000
 	
 	APTallyName					:	String	: 25003	
 	APName							: String	: 25004
