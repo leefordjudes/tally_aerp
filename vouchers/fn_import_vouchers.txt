@@ -143,7 +143,7 @@
 	05723:			 SET VALUE: Narration							: "Imported from auditplus" 				
 
 ;	05724:			 SET VALUE: BankName							: ##TallyNameVar ;;"AXIS BANK" ;;$account_name
-	05725:			 SET VALUE: Amount								: $$AsAmount:$$Abs:$amount
+	05725:			 SET VALUE: Amount								: $$AsAmount:$amount * -1
 ; 0571X:			 SET VALUE: PaymentFavouring			: "MEDICHEMS"
 ; 0571X:		   SET VALUE: BankPartyName					: "MEDICHEMS"	;;$particulars			
 ;	0571X:			 SET VALUE: ChequeCrossComment		: "A/c Payee" 	
