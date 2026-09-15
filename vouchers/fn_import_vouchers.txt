@@ -134,7 +134,7 @@
 	05714: 		    If: $txn_type = "CHEQUE"
  	05715:			   SET VALUE: TransactionType				: "Cheque"    ;;$txn_type ;;$$LocaleString:"Cheque"
 	05716:        Else
-	05717:			 	 SET VALUE: TransactionType				: "Same Bank Transfer"    ;;"Same Bank Transfer" OR "Inter Bank Transfer"	
+	05717:			 	 SET VALUE: TransactionType				: "Others"    ;;"Same Bank Transfer" OR "Inter Bank Transfer"	
 	05718: 		    End If
 	05719: 		   End If
 	05720: 		   If: NOt $$IsEmpty:$inst_no

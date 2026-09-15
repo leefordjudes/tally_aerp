@@ -4,3 +4,4 @@ $  - object field
 $$ - function
 ## - variable in current scope
 #  - modifier
+! - optional modifier
