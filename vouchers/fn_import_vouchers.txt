@@ -31,11 +31,16 @@
 	01400: End Block
 	01500: If: ##IsLedgerAvailabilityVerified = Yes
 	01600:	Walk Collection: ApVouchersDownload DataSource
+	01601:	 If: $$NumItems:data > 0
 	01700: 	 START PROGRESS: ($$NumItems:data):"Import Auditplus Voucher":"Creating vouchers"
 	01800: 	 Walk Collection: data
 	01900:		SHOW PROGRESS: $$LoopIndex
 	02000: 		call : APSaveEachVoucher				
 	02100: 	 End Walk
+	02101:   END PROGRESS
+	02102:  ELSE
+	02103:     MSGBOX : "Warning" : "No vouchers found to import."
+	02104:  END IF
 	02200: 	End Walk
 	02300: 	Msg Box: "Result": ($$String:##CreatedVch) +" "+@GetTallyVoucherTypeNameLcf+" Vouchers\n Successfully Created"
 	02400: 	If: ##SkippedVch > 0 
